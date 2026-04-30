@@ -3,8 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#22c55e">
 <title>내 자산</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'><defs><linearGradient id='g' x1='50%25' y1='0%25' x2='50%25' y2='100%25'><stop offset='0%25' stop-color='%2322c55e'/><stop offset='55%25' stop-color='%2322c55e'/><stop offset='72%25' stop-color='%231e6df2'/><stop offset='85%25' stop-color='%231d4ed8'/><stop offset='100%25' stop-color='%2310b981'/></linearGradient></defs><rect x='46' y='86' width='60' height='150' rx='30' fill='%2322c55e'/><rect x='98' y='58' width='60' height='150' rx='30' fill='url(%23g)'/><rect x='150' y='30' width='60' height='150' rx='30' fill='url(%23g)'/></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'><defs><linearGradient id='g' x1='50%25' y1='0%25' x2='50%25' y2='100%25'><stop offset='0%25' stop-color='%2322c55e'/><stop offset='55%25' stop-color='%2322c55e'/><stop offset='72%25' stop-color='%231e6df2'/><stop offset='85%25' stop-color='%231d4ed8'/><stop offset='100%25' stop-color='%2310b981'/></linearGradient></defs><rect x='46' y='86' width='60' height='150' rx='30' fill='%2322c55e'/><rect x='98' y='58' width='60' height='150' rx='30' fill='url(%23g)'/><rect x='150' y='30' width='60' height='150' rx='30' fill='url(%23g)'/></svg>">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" rel="stylesheet">
 <style>
@@ -50,6 +52,23 @@
   --c-cash: #8b95a1;
   --c-cash-soft: #e9ecef;
   --c-cash-text: #495057;
+
+  /* Strategy classification colors */
+  --c-index: #5f3dc4;
+  --c-index-soft: #f3f0ff;
+  --c-index-text: #4c2aa3;
+
+  --c-bluechip: #1971c2;
+  --c-bluechip-soft: #e7f5ff;
+  --c-bluechip-text: #0c5396;
+
+  --c-growth: #e8590c;
+  --c-growth-soft: #fff4e6;
+  --c-growth-text: #b94a05;
+
+  --c-risky: #c92a2a;
+  --c-risky-soft: #fff5f5;
+  --c-risky-text: #9c1f1f;
 
   /* Status */
   --warn: #f59f00;
@@ -104,7 +123,17 @@ a { color: inherit; text-decoration: none; }
 }
 .header.scrolled { border-bottom-color: var(--border); box-shadow: var(--shadow-sm); }
 .header-inner { max-width: 720px; margin: 0 auto; padding: 0; display: flex; align-items: center; gap: 16px; height: 56px; }
-.brand { font-size: 17px; font-weight: 700; letter-spacing: -0.03em; display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.brand { font-size: 17px; font-weight: 700; letter-spacing: -0.03em; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.brand-logo {
+  width: 32px; height: 32px;
+  padding: 5px;  /* 32 * 15% ≈ 5px - "포트폴리오 페이지6" 패딩 비율 */
+  border-radius: 9px;
+  background: #ffffff;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+.brand-logo svg { width: 100%; height: 100%; display: block; }
 .brand-meta { font-size: 11px; color: var(--text-3); font-weight: 500; display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 .brand-meta .live { width: 6px; height: 6px; border-radius: 50%; background: var(--brand); animation: pulse 2s ease-in-out infinite; }
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
@@ -261,7 +290,11 @@ a { color: inherit; text-decoration: none; }
   width: 38px; height: 38px; flex-shrink: 0;
   border-radius: 10px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 800; letter-spacing: 0.02em;
+  font-size: 10px; font-weight: 800; letter-spacing: 0;
+  text-align: center;
+  padding: 0 2px;
+  line-height: 1.1;
+  overflow: hidden;
 }
 .holding-badge.US { background: var(--c-us-soft); color: var(--c-us-text); }
 .holding-badge.KR { background: var(--c-kr-soft); color: var(--c-kr-text); }
@@ -296,21 +329,36 @@ a { color: inherit; text-decoration: none; }
 
 /* Donut */
 .alloc-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; }
-.alloc-grid { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 20px; align-items: center; }
-.donut-wrap { position: relative; width: 170px; height: 170px; margin: 0 auto; }
+.alloc-grid { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 24px; align-items: center; }
+.donut-wrap { position: relative; width: 170px; height: 170px; }
+.legend {
+  display: flex; flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  height: fit-content;
+}
+.legend-row {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px;
+  flex-wrap: nowrap; white-space: nowrap;
+  min-width: 0;
+}
 .donut-svg { width: 100%; height: 100%; }
 .donut-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
 .donut-center-label { font-size: 11px; color: var(--text-3); font-weight: 600; }
 .donut-center-value { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; margin-top: 2px; }
-.legend { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
-.legend-row { display: flex; align-items: center; gap: 8px; font-size: 13px; flex-wrap: nowrap; white-space: nowrap; min-width: 0; }
 .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
-.legend-label { flex: 1 1 auto; min-width: 0; color: var(--text-2); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.legend-label { flex: 1 1 0; min-width: 0; color: var(--text-2); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .legend-value { flex-shrink: 0; font-weight: 700; letter-spacing: -0.01em; white-space: nowrap; }
-.legend-pct { flex-shrink: 0; color: var(--text-3); font-weight: 600; font-size: 12px; margin-left: 4px; white-space: nowrap; }
-.legend-row.empty .legend-label,
-.legend-row.empty .legend-value,
-.legend-row.empty .legend-pct { color: var(--text-4); }
+.legend-pct { flex-shrink: 0; color: var(--text-3); font-weight: 600; font-size: 12px; margin-left: 2px; white-space: nowrap; }
+.legend-target { flex-shrink: 0; color: var(--text-4); font-weight: 500; font-size: 11px; white-space: nowrap; }
+.legend-dev { flex-shrink: 0; font-weight: 700; font-size: 11px; padding: 2px 5px; border-radius: 4px; white-space: nowrap; margin-left: 2px; }
+.legend-dev.ok { background: var(--bg-card); color: var(--text-3); }
+.legend-dev.warn { background: var(--warn-soft); color: var(--warn); }
+.legend-dev.alert { background: var(--up-soft); color: var(--up); }
+.legend-row.zero .legend-label,
+.legend-row.zero .legend-value,
+.legend-row.zero .legend-pct { color: var(--text-4); }
 
 /* Target weights tracking */
 .target-card {
@@ -350,11 +398,25 @@ a { color: inherit; text-decoration: none; }
   margin-bottom: 10px;
 }
 .target-row-badge {
-  width: 32px; height: 32px; flex-shrink: 0;
+  width: 36px; height: 32px; flex-shrink: 0;
   border-radius: 8px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 10px; font-weight: 800;
+  font-size: 9px; font-weight: 800;
+  text-align: center;
+  padding: 0 2px;
+  line-height: 1.1;
+  overflow: hidden;
 }
+/* Strategy classifications */
+.target-row-badge.INDEX,
+.holding-badge.INDEX { background: var(--c-index-soft); color: var(--c-index-text); }
+.target-row-badge.BLUECHIP,
+.holding-badge.BLUECHIP { background: var(--c-bluechip-soft); color: var(--c-bluechip-text); }
+.target-row-badge.GROWTH,
+.holding-badge.GROWTH { background: var(--c-growth-soft); color: var(--c-growth-text); }
+.target-row-badge.RISKY,
+.holding-badge.RISKY { background: var(--c-risky-soft); color: var(--c-risky-text); }
+/* Market-based (legacy, used when classification not set) */
 .target-row-badge.US { background: var(--c-us-soft); color: var(--c-us-text); }
 .target-row-badge.KR { background: var(--c-kr-soft); color: var(--c-kr-text); }
 .target-row-badge.CRYPTO { background: var(--c-crypto-soft); color: var(--c-crypto-text); }
@@ -391,6 +453,10 @@ a { color: inherit; text-decoration: none; }
 .target-bar-fill.KR { background: var(--c-kr); }
 .target-bar-fill.CRYPTO { background: var(--c-crypto); }
 .target-bar-fill.CASH { background: var(--c-cash); }
+.target-bar-fill.INDEX { background: var(--c-index); }
+.target-bar-fill.BLUECHIP { background: var(--c-bluechip); }
+.target-bar-fill.GROWTH { background: var(--c-growth); }
+.target-bar-fill.RISKY { background: var(--c-risky); }
 .target-bar-target {
   position: absolute; top: -3px; bottom: -3px;
   width: 2px;
@@ -643,7 +709,7 @@ a { color: inherit; text-decoration: none; }
     margin-top: 32px;
     margin-bottom: 0;
   }
-  /* 리밸런싱 없을 땐 1열로 */
+  /* 리밸런싱 없을 땐 1열로 + 좌측 컨텐츠가 너무 넓어지지 않도록 카드 폭 제한 */
   .main-grid.single-col {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -880,7 +946,25 @@ table.yearly tbody tr.event td { background: var(--brand-soft); }
 
 <div class="header" id="header">
   <div class="header-inner">
-    <div class="brand">💰 <span>내 자산</span></div>
+    <div class="brand">
+      <span class="brand-logo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+          <defs>
+            <linearGradient id="brandG" x1="50%" y1="0%" x2="50%" y2="100%">
+              <stop offset="0%" stop-color="#22c55e"/>
+              <stop offset="55%" stop-color="#22c55e"/>
+              <stop offset="72%" stop-color="#1e6df2"/>
+              <stop offset="85%" stop-color="#1d4ed8"/>
+              <stop offset="100%" stop-color="#10b981"/>
+            </linearGradient>
+          </defs>
+          <rect x="46" y="86" width="60" height="150" rx="30" fill="#22c55e"/>
+          <rect x="98" y="58" width="60" height="150" rx="30" fill="url(#brandG)"/>
+          <rect x="150" y="30" width="60" height="150" rx="30" fill="url(#brandG)"/>
+        </svg>
+      </span>
+      <span>내 자산</span>
+    </div>
     <div class="brand-meta">
       <span class="live"></span>
       <span id="fxRate">USD/KRW —</span>
@@ -937,17 +1021,27 @@ table.yearly tbody tr.event td { background: var(--brand-soft); }
           </div>
         </div>
 
+        <div class="target-card" id="groupCard">
+          <div class="target-card-head">
+            <div class="target-card-title">📊 그룹 목표 비중</div>
+            <button class="btn sm ghost" onclick="openGroupTargetSheet()" style="font-size:12px; height:28px; padding:0 10px;">편집</button>
+          </div>
+          <div class="target-card-sub">전략 그룹(인덱스/우량주/성장주/고위험) 비중 추적</div>
+          <div id="groupRows"></div>
+        </div>
+
         <div class="target-card" id="targetCard">
           <div class="target-card-head">
             <div class="target-card-title">🎯 종목별 목표 비중</div>
           </div>
-          <div class="target-card-sub">목표 대비 현재 비중을 추적해 리밸런싱 시점을 파악하세요</div>
+          <div class="target-card-sub">개별 종목 단위 목표 비중 추적 (선택적)</div>
           <div id="targetSummary"></div>
           <div id="targetRows"></div>
         </div>
       </div>
 
       <aside class="main-side">
+        <div class="section-head"><h2>리밸런싱</h2></div>
         <div class="rebal-card" id="rebalCard"></div>
       </aside>
     </div>
@@ -959,6 +1053,7 @@ table.yearly tbody tr.event td { background: var(--brand-soft); }
     <div class="account-list" id="accountList"></div>
 
     <div class="footer-actions">
+      <button class="btn sm" id="btnLoadSample">📊 엑셀 데이터로 초기화</button>
       <button class="btn sm" id="btnExport">⬇ 내보내기</button>
       <button class="btn sm" id="btnImport">⬆ 불러오기</button>
       <input type="file" id="fileImport" accept=".json" style="display:none">
@@ -1128,6 +1223,7 @@ let state = {
   accounts: [],
   prices: {},
   openAccounts: {},
+  groupTargets: null,  // init 시점에 DEFAULT_GROUP_TARGETS로 채움
 };
 
 function save() {
@@ -1137,6 +1233,7 @@ function save() {
     accounts: state.accounts,
     prices: state.prices,
     openAccounts: state.openAccounts,
+    groupTargets: state.groupTargets,
   }));
 }
 function load() {
@@ -1353,6 +1450,42 @@ const CATEGORY_COLOR = {
   CASH: '#8b95a1',
 };
 
+/* 전략 기반 자산 분류 시스템 — 사용자 목표: 인덱스 50% / 우량주 30% / 성장주 10% / 고위험 10% */
+const CLASSIFICATIONS = ['INDEX', 'BLUECHIP', 'GROWTH', 'RISKY', 'CASH'];
+
+const CLASSIFICATION_NAME = {
+  INDEX:    '지수(인덱스)',
+  BLUECHIP: '우량주',
+  GROWTH:   '성장주',
+  RISKY:    '고위험자산',
+  CASH:     '현금',
+};
+
+const CLASSIFICATION_SHORT = {
+  INDEX:    '인덱스',
+  BLUECHIP: '우량주',
+  GROWTH:   '성장주',
+  RISKY:    '고위험',
+  CASH:     '현금',
+};
+
+const CLASSIFICATION_COLOR = {
+  INDEX:    '#5f3dc4',
+  BLUECHIP: '#1971c2',
+  GROWTH:   '#e8590c',
+  RISKY:    '#c92a2a',
+  CASH:     '#8b95a1',
+};
+
+/* 사용자 그룹 목표 (변경 가능 - localStorage 저장) */
+const DEFAULT_GROUP_TARGETS = {
+  INDEX:    50,
+  BLUECHIP: 30,
+  GROWTH:   10,
+  RISKY:    10,
+  CASH:     0,
+};
+
 const ACCOUNT_ICON = {
   '일반주식': { emoji: '📈', cls: 't-1' },
   '해외주식': { emoji: '🌎', cls: 't-1' },
@@ -1501,7 +1634,50 @@ function renderInsights(t, cashTotal, cashRatio) {
     return;
   }
 
-  // 1. 리밸런싱 필요 여부 (편차 ±3%p 초과 종목)
+  // 1. 그룹별 목표 대비 편차 (인덱스/우량주/성장주/고위험)
+  const groupTargets = state.groupTargets || DEFAULT_GROUP_TARGETS;
+  if (t.value > 0) {
+    const groupTotals = { INDEX: 0, BLUECHIP: 0, GROWTH: 0, RISKY: 0, CASH: 0 };
+    state.accounts.forEach(acc => {
+      groupTotals.CASH += accountMetrics(acc).cashKRW;
+      acc.holdings.forEach(h => {
+        const m = holdingMetrics(h);
+        if (m.valueKRW != null) groupTotals[getHoldingClassification(h)] += m.valueKRW;
+      });
+    });
+    const groupDevs = CLASSIFICATIONS
+      .filter(k => groupTargets[k] > 0)
+      .map(k => {
+        const currentPct = (groupTotals[k] / t.value) * 100;
+        const targetPct = groupTargets[k];
+        return { k, currentPct, targetPct, dev: currentPct - targetPct };
+      });
+    const groupOverflow = groupDevs.filter(d => Math.abs(d.dev) > 5);
+    if (groupOverflow.length > 0) {
+      const top = groupOverflow.sort((a, b) => Math.abs(b.dev) - Math.abs(a.dev))[0];
+      const direction = top.dev > 0 ? '비중 초과' : '비중 미달';
+      const more = groupOverflow.length > 1 ? ` +${groupOverflow.length - 1}` : '';
+      insights.push({
+        type: 'alert',
+        icon: '📊',
+        title: `${CLASSIFICATION_NAME[top.k]}${more} ${direction}`,
+        desc: `목표 ${top.targetPct}% · 현재 ${top.currentPct.toFixed(1)}% (${top.dev > 0 ? '+' : ''}${top.dev.toFixed(1)}%p)`,
+        cta: '그룹 보기',
+        scrollTo: 'groupCard',
+        priority: 0,
+      });
+    } else if (groupDevs.length > 0) {
+      insights.push({
+        type: 'success',
+        icon: '✓',
+        title: '그룹 비중 균형 잡힘',
+        desc: `인덱스/우량주/성장주/고위험 모두 목표 ±5%p 이내`,
+        priority: 6,
+      });
+    }
+  }
+
+  // 2. 종목별 리밸런싱 필요 여부 (편차 ±3%p 초과 종목)
   const totalForTarget = allHoldings.reduce((s, h) => s + (holdingMetrics(h).valueKRW || 0), 0);
   if (totalForTarget > 0) {
     const targeted = allHoldings.filter(h => h.targetWeight > 0);
@@ -1729,6 +1905,9 @@ function sortHoldings(holdings) {
 function holdingRow(h) {
   const m = holdingMetrics(h);
   const cat = marketCategory(h.market);
+  // 분류가 있으면 분류 라벨 사용, 없으면 시장 라벨 (짧게)
+  const klass = h.classification || cat;
+  const badgeLabel = CLASSIFICATION_SHORT[klass] || (cat === 'CASH' ? '현금' : cat === 'CRYPTO' ? 'CR' : cat);
   let metaText;
   if (h.market === 'CASH') {
     metaText = `${escapeHtml(h.ticker)} 현금`;
@@ -1740,7 +1919,7 @@ function holdingRow(h) {
   }
   return `
     <div class="holding">
-      <div class="holding-badge ${cat}">${cat === 'CASH' ? '현금' : cat}</div>
+      <div class="holding-badge ${klass}">${badgeLabel}</div>
       <div class="holding-info">
         <div class="holding-name">${escapeHtml(h.name || h.ticker)}</div>
         <div class="holding-meta">${metaText}</div>
@@ -1761,23 +1940,36 @@ function toggleAccount(id) {
 window.toggleAccount = toggleAccount;
 
 /* Donut chart */
+function getHoldingClassification(h) {
+  // 명시적 분류가 있으면 우선, 없으면 시장 기반 추정
+  if (h.classification && CLASSIFICATIONS.includes(h.classification)) return h.classification;
+  if (h.market === 'CASH') return 'CASH';
+  if (h.market === 'CRYPTO') return 'RISKY';  // 암호화폐 기본은 고위험
+  return 'BLUECHIP';  // 주식 기본은 우량주
+}
+
 function renderAllocation() {
-  const totals = { US: 0, KR: 0, CRYPTO: 0, CASH: 0 };
+  const totals = { INDEX: 0, BLUECHIP: 0, GROWTH: 0, RISKY: 0, CASH: 0 };
   state.accounts.forEach(acc => {
+    // 계좌 cashBalance도 현금에 합산
     totals.CASH += accountMetrics(acc).cashKRW;
     acc.holdings.forEach(h => {
       const m = holdingMetrics(h);
-      if (m.valueKRW != null) totals[marketCategory(h.market)] += m.valueKRW;
+      if (m.valueKRW != null) {
+        totals[getHoldingClassification(h)] += m.valueKRW;
+      }
     });
   });
 
   const labels = {
-    US: { name: '미국주식', color: CATEGORY_COLOR.US },
-    KR: { name: '한국주식', color: CATEGORY_COLOR.KR },
-    CRYPTO: { name: '암호화폐', color: CATEGORY_COLOR.CRYPTO },
-    CASH: { name: '현금', color: CATEGORY_COLOR.CASH },
+    INDEX:    { name: '지수(인덱스)', color: CLASSIFICATION_COLOR.INDEX },
+    BLUECHIP: { name: '우량주',       color: CLASSIFICATION_COLOR.BLUECHIP },
+    GROWTH:   { name: '성장주',       color: CLASSIFICATION_COLOR.GROWTH },
+    RISKY:    { name: '고위험자산',   color: CLASSIFICATION_COLOR.RISKY },
+    CASH:     { name: '현금',         color: CLASSIFICATION_COLOR.CASH },
   };
   const total = Object.values(totals).reduce((s, v) => s + v, 0);
+  const groupTargets = state.groupTargets || DEFAULT_GROUP_TARGETS;
 
   const donutWrap = $('#donutWrap');
   if (total === 0) {
@@ -1789,7 +1981,7 @@ function renderAllocation() {
         <div class="donut-center-label">자산 없음</div>
       </div>`;
   } else {
-    const segments = ['KR', 'US', 'CRYPTO', 'CASH']
+    const segments = CLASSIFICATIONS
       .filter(k => totals[k] > 0)
       .map(k => ({ key: k, value: totals[k], color: labels[k].color, name: labels[k].name }));
     donutWrap.innerHTML = renderDonut(segments, total) + `
@@ -1802,27 +1994,190 @@ function renderAllocation() {
 
   const legend = $('#legendWrap');
   legend.innerHTML = '';
-  ['KR', 'US', 'CRYPTO', 'CASH'].forEach(k => {
-    // 현금은 항상 표시, 다른 카테고리는 0이면 숨김
-    if (k !== 'CASH' && totals[k] === 0 && total > 0) return;
-    const pct = total > 0 ? (totals[k] / total) * 100 : 0;
+  CLASSIFICATIONS.forEach(k => {
+    const targetPct = groupTargets[k] || 0;
+    const currentPct = total > 0 ? (totals[k] / total) * 100 : 0;
     const isEmpty = totals[k] === 0;
+    // 현금/목표 있는 카테고리는 항상 표시, 그 외 0이면 생략
+    if (isEmpty && k !== 'CASH' && targetPct === 0 && total > 0) return;
+
+    const dev = currentPct - targetPct;
+    let devLabel = '';
+    if (targetPct > 0) {
+      const sign = dev >= 0 ? '+' : '';
+      devLabel = ` <span class="legend-dev ${Math.abs(dev) > 3 ? 'alert' : (Math.abs(dev) > 1 ? 'warn' : 'ok')}">${sign}${dev.toFixed(1)}%p</span>`;
+    }
+
     const div = document.createElement('div');
-    div.className = 'legend-row' + (isEmpty ? ' empty' : '');
+    div.className = 'legend-row' + (isEmpty ? ' zero' : '');
     div.dataset.key = k;
     div.innerHTML = `
       <span class="legend-dot" style="background:${labels[k].color}${isEmpty ? '; opacity:0.35' : ''}"></span>
       <span class="legend-label">${labels[k].name}</span>
       <span class="legend-value num">${fmtKRWShort(totals[k])}</span>
-      <span class="legend-pct num">${pct.toFixed(1)}%</span>`;
+      <span class="legend-pct num">${currentPct.toFixed(1)}%</span>
+      ${targetPct > 0 ? `<span class="legend-target num">/ ${targetPct}%</span>` : ''}
+      ${devLabel}`;
     legend.appendChild(div);
   });
   if (total === 0) {
     legend.innerHTML = `<div class="dim" style="font-size:13px">종목을 추가하면 배분이 표시됩니다</div>`;
   }
 
+  renderGroupTargets();
   renderTargetWeights();
 }
+
+/**
+ * 그룹별 목표 비중 카드 (인덱스/우량주/성장주/고위험/현금)
+ */
+function renderGroupTargets() {
+  const wrap = $('#groupCard');
+  const rowsEl = $('#groupRows');
+  if (!wrap || !rowsEl) return;
+
+  const allHoldings = state.accounts.flatMap(a => a.holdings);
+  if (allHoldings.length === 0) {
+    wrap.style.display = 'none';
+    return;
+  }
+  wrap.style.display = 'block';
+
+  const groupTargets = state.groupTargets || DEFAULT_GROUP_TARGETS;
+  const groupTotals = { INDEX: 0, BLUECHIP: 0, GROWTH: 0, RISKY: 0, CASH: 0 };
+  state.accounts.forEach(acc => {
+    groupTotals.CASH += accountMetrics(acc).cashKRW;
+    acc.holdings.forEach(h => {
+      const m = holdingMetrics(h);
+      if (m.valueKRW != null) groupTotals[getHoldingClassification(h)] += m.valueKRW;
+    });
+  });
+  const total = Object.values(groupTotals).reduce((s, v) => s + v, 0);
+  if (total === 0) { rowsEl.innerHTML = ''; return; }
+
+  const data = CLASSIFICATIONS.map(k => {
+    const currentValue = groupTotals[k];
+    const currentPct = (currentValue / total) * 100;
+    const targetPct = groupTargets[k] || 0;
+    const dev = currentPct - targetPct;
+    return { k, currentValue, currentPct, targetPct, dev };
+  });
+
+  // 표시: 목표 있는 그룹 + 보유한 그룹
+  const visible = data.filter(d => d.targetPct > 0 || d.currentValue > 0);
+  const maxPct = Math.max(...visible.map(d => Math.max(d.currentPct, d.targetPct)), 5);
+
+  rowsEl.innerHTML = visible.map(d => {
+    const hasTarget = d.targetPct > 0;
+    let devLabel, devClass;
+    if (!hasTarget) {
+      devLabel = '미설정';
+      devClass = 'unset';
+    } else {
+      const absDev = Math.abs(d.dev);
+      const sign = d.dev > 0 ? '+' : '';
+      devLabel = `${sign}${d.dev.toFixed(1)}%p`;
+      // 그룹 단위는 ±5%p 임계 (개별 종목보다 관대)
+      if (absDev <= 2) devClass = 'ok';
+      else if (absDev <= 5) devClass = 'warn';
+      else devClass = 'alert';
+    }
+    const barFillPct = (d.currentPct / maxPct) * 100;
+    const targetMarkerPct = hasTarget ? (d.targetPct / maxPct) * 100 : null;
+
+    return `
+      <div class="target-row">
+        <div class="target-row-top">
+          <div class="target-row-badge ${d.k}">${CLASSIFICATION_SHORT[d.k]}</div>
+          <div class="target-row-name">${CLASSIFICATION_NAME[d.k]}</div>
+          <div class="target-row-deviation ${devClass}">${devLabel}</div>
+        </div>
+        <div class="target-bar-wrap">
+          <div class="target-bar-fill ${d.k}" style="width:${barFillPct.toFixed(1)}%"></div>
+          ${targetMarkerPct !== null ? `<div class="target-bar-target" style="left:calc(${targetMarkerPct.toFixed(1)}% - 1px)"></div>` : ''}
+        </div>
+        <div class="target-row-meta">
+          <span><span class="label">현재</span><span class="value num">${d.currentPct.toFixed(1)}%</span></span>
+          ${hasTarget ? `<span><span class="label">목표</span><span class="value num">${d.targetPct}%</span></span>` : ''}
+          <span><span class="label">평가액</span><span class="value num">${fmtKRWShort(d.currentValue)}</span></span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+/**
+ * 그룹 목표 편집 시트
+ */
+function openGroupTargetSheet() {
+  const targets = state.groupTargets || DEFAULT_GROUP_TARGETS;
+  $('#sheetTitle').textContent = '그룹 목표 비중 편집';
+  $('#sheetBody').innerHTML = `
+    <div class="field-hint" style="margin-bottom: 14px; padding: 12px; background: var(--bg-soft); border-radius: 8px;">
+      각 전략 그룹의 목표 비중(%)을 설정하세요.<br>
+      합계 100%가 되도록 조정하시면 됩니다.
+    </div>
+    ${CLASSIFICATIONS.map(k => `
+      <div class="field-row" style="grid-template-columns: 1fr 120px; align-items: center; gap: 12px; margin-bottom: 14px;">
+        <div>
+          <div style="font-weight: 700; font-size: 14px;">${CLASSIFICATION_NAME[k]}</div>
+          <div style="font-size: 11px; color: var(--text-3);">${k === 'INDEX' ? 'QQQ, KOSPI, ETF 등' :
+            k === 'BLUECHIP' ? 'NVDA, GOOGL 등 우량주' :
+            k === 'GROWTH' ? 'TSLA, PLTR, RKLB 등' :
+            k === 'RISKY' ? 'MSTR, BTC, ETH 등 고변동' :
+            '예수금'}</div>
+        </div>
+        <input type="number" id="gt-${k}" value="${targets[k] || 0}" step="any" min="0" max="100"
+               style="text-align: right; font-weight: 700;">
+      </div>
+    `).join('')}
+    <div id="gtSum" style="text-align: right; padding: 12px; background: var(--bg-card); border-radius: 8px; font-weight: 700; font-size: 14px;">
+      합계: <span id="gtSumVal" class="num">100%</span>
+    </div>`;
+
+  // 합계 실시간 계산
+  const updateSum = () => {
+    let sum = 0;
+    CLASSIFICATIONS.forEach(k => { sum += parseFloat($('#gt-' + k).value) || 0; });
+    const sumEl = $('#gtSumVal');
+    sumEl.textContent = sum.toFixed(1) + '%';
+    sumEl.parentElement.style.color = Math.abs(sum - 100) < 0.5 ? 'var(--brand)' : 'var(--up)';
+  };
+  CLASSIFICATIONS.forEach(k => {
+    $('#gt-' + k).addEventListener('input', updateSum);
+  });
+  updateSum();
+
+  $('#sheetFoot').innerHTML = `
+    <button class="btn ghost" onclick="resetGroupTargets()" style="color:var(--text-3)">기본값</button>
+    <button class="btn full primary" id="btnSave">저장</button>`;
+
+  $('#btnSave').onclick = () => {
+    const newTargets = {};
+    CLASSIFICATIONS.forEach(k => {
+      const v = parseFloat($('#gt-' + k).value);
+      newTargets[k] = isFinite(v) && v >= 0 ? v : 0;
+    });
+    state.groupTargets = newTargets;
+    save();
+    render();
+    closeSheet();
+    toast('그룹 목표 비중 저장됨');
+  };
+  openSheet();
+}
+window.openGroupTargetSheet = openGroupTargetSheet;
+
+function resetGroupTargets() {
+  CLASSIFICATIONS.forEach(k => {
+    const input = $('#gt-' + k);
+    if (input) input.value = DEFAULT_GROUP_TARGETS[k];
+  });
+  // 합계도 업데이트
+  let sum = 0;
+  CLASSIFICATIONS.forEach(k => { sum += DEFAULT_GROUP_TARGETS[k]; });
+  $('#gtSumVal').textContent = sum.toFixed(1) + '%';
+}
+window.resetGroupTargets = resetGroupTargets;
 
 function attachDonutHover(segments, total) {
   const svg = $('#donutWrap .donut-svg');
@@ -2019,10 +2374,7 @@ function renderRebalancing(data, totalValue) {
   const actionable = actions.filter(a => Math.abs(a.diff) >= threshold);
 
   const head = `
-    <div class="target-card-head">
-      <div class="target-card-title">🔧 리밸런싱 가이드</div>
-    </div>
-    <div class="target-card-sub">목표 비중 도달을 위한 매수·매도 금액</div>`;
+    <div class="target-card-sub" style="margin-bottom: 10px;">목표 비중 도달을 위한 매수·매도 금액</div>`;
 
   if (actionable.length === 0) {
     wrap.innerHTML = head + `
@@ -2286,10 +2638,35 @@ function openHoldingSheet(holdingId = null, presetAccountId = null) {
       </select>
     </div>
     <div class="field">
+      <label>📊 자산 분류 (전략 그룹)</label>
+      <div class="pill-group" id="hClassGroup">
+        ${[
+          { v: 'INDEX',    l: '지수' },
+          { v: 'BLUECHIP', l: '우량주' },
+          { v: 'GROWTH',   l: '성장주' },
+          { v: 'RISKY',    l: '고위험' },
+          { v: 'CASH',     l: '현금' },
+        ].map(o => {
+          const current = foundH?.classification || (foundH?.market === 'CASH' ? 'CASH' : foundH?.market === 'CRYPTO' ? 'RISKY' : 'BLUECHIP');
+          const active = current === o.v;
+          return `<button class="pill ${active ? 'active' : ''}" data-value="${o.v}">${o.l}</button>`;
+        }).join('')}
+      </div>
+      <div class="field-hint">목표 그룹 비중(인덱스 50% / 우량주 30% / 성장주 10% / 고위험 10%)에 사용됩니다.</div>
+    </div>
+    <div class="field">
       <label>🎯 목표 비중 (선택)</label>
       <input type="number" id="hTarget" placeholder="예: 17.5" step="any" min="0" max="100" value="${foundH && foundH.targetWeight ? foundH.targetWeight : ''}">
-      <div class="field-hint">전체 자산 중 이 종목이 차지해야 할 목표 비중(%). V8 포트폴리오 기준값을 입력하세요.</div>
+      <div class="field-hint">개별 종목 단위 목표 비중(%). 위 그룹 분류와 별개로 종목별 추적이 필요할 때만 입력.</div>
     </div>`;
+
+  // 자산 분류 pill 핸들러
+  $$('#hClassGroup .pill').forEach(p => {
+    p.onclick = () => {
+      $$('#hClassGroup .pill').forEach(x => x.classList.remove('active'));
+      p.classList.add('active');
+    };
+  });
 
   $$('#hMarketGroup .pill').forEach(p => {
     p.onclick = () => {
@@ -2350,9 +2727,11 @@ function saveHoldingForm() {
   if (!isFinite(qty) || qty <= 0) { toast('보유 수량을 확인해주세요'); return; }
   if (!isFinite(cost) || cost < 0) { toast('평균 매수가를 확인해주세요'); return; }
   const marketBtn = $('#hMarketGroup .pill.active');
+  const classBtn = $('#hClassGroup .pill.active');
   const targetWeight = parseFloat($('#hTarget').value);
   const data = {
     market: marketBtn ? marketBtn.dataset.value : 'US',
+    classification: classBtn ? classBtn.dataset.value : null,
     ticker,
     name: $('#hName').value.trim(),
     qty, avgCost: cost,
@@ -2373,6 +2752,74 @@ function saveHoldingForm() {
 
 window.openAccountSheet = openAccountSheet;
 window.openHoldingSheet = openHoldingSheet;
+
+/**
+ * 사용자 실제 포트폴리오 시드 데이터 (엑셀 자산관리.xlsx 정확 반영)
+ * - USD 종목: avgCost는 달러 단가, costCurrency: 'USD' (자동 환율 환산)
+ * - KRW 종목: avgCost는 원화 단가, costCurrency: 'KRW'
+ * - 모든 평가액은 화면에서 KRW로 표시됨
+ */
+function buildSeedAccounts() {
+  const toss = { id: uid(), name: '토스증권 일반계좌', type: '일반주식', currency: 'USD', cashBalance: 0,
+    holdings: [
+      // === 미국주식 (USD) ===
+      { id: uid(), market: 'US', ticker: 'NVDA',  name: '엔비디아',           qty: 24.694420554719414, avgCost: 186.04, costCurrency: 'USD', classification: 'BLUECHIP' },
+      { id: uid(), market: 'US', ticker: 'GOOGL', name: '알파벳A',            qty: 17.43929094528111,  avgCost: 266.27, costCurrency: 'USD', classification: 'BLUECHIP' },
+      { id: uid(), market: 'US', ticker: 'TSLA',  name: '테슬라',             qty: 7.451775154632167,  avgCost: 441.37, costCurrency: 'USD', classification: 'GROWTH' },
+      { id: uid(), market: 'US', ticker: 'PLTR',  name: '팔란티어',           qty: 18.59531772575251,  avgCost: 179.40, costCurrency: 'USD', classification: 'GROWTH' },
+      { id: uid(), market: 'US', ticker: 'RKLB',  name: '로켓랩',             qty: 37.797258810964756, avgCost: 56.18,  costCurrency: 'USD', classification: 'GROWTH' },
+      { id: uid(), market: 'US', ticker: 'IREN',  name: '아이렌',             qty: 38.613231552162844, avgCost: 51.09,  costCurrency: 'USD', classification: 'RISKY' },
+      { id: uid(), market: 'US', ticker: 'NTLA',  name: '인텔리아 테라퓨틱스',  qty: 150.97435897435898, avgCost: 12.87,  costCurrency: 'USD', classification: 'RISKY' },
+      { id: uid(), market: 'US', ticker: 'IAUM',  name: '아이셰어즈 금 미니 ETF', qty: 43.92103896103896, avgCost: 38.50, costCurrency: 'USD', classification: 'INDEX' },
+      { id: uid(), market: 'US', ticker: 'INFQ',  name: '인플렉션',           qty: 44.01103230890465,  avgCost: 12.69,  costCurrency: 'USD', classification: 'RISKY' },
+      // === 한국 ETF (KRW) ===
+      { id: uid(), market: 'KR_KS', ticker: '487230', name: 'KODEX 미국AI전력핵심인프라', qty: 133, avgCost: 18973,  costCurrency: 'KRW', classification: 'GROWTH' },
+      { id: uid(), market: 'KR_KS', ticker: '122630', name: 'KODEX 레버리지',          qty: 20,  avgCost: 104165, costCurrency: 'KRW', classification: 'INDEX' },
+      // === 현금 (각 통화별로 명확히 구분) ===
+      { id: uid(), market: 'CASH', ticker: 'KRW', name: '원화(KRW)', qty: 1, avgCost: 174716,   costCurrency: 'KRW', classification: 'CASH' },
+      { id: uid(), market: 'CASH', ticker: 'USD', name: '미화($)',   qty: 1, avgCost: 10453.04, costCurrency: 'USD', classification: 'CASH' },
+    ]};
+  const miraeS = { id: uid(), name: '미래에셋증권 일반계좌', type: '일반주식', currency: 'USD', cashBalance: 0,
+    holdings: [
+      { id: uid(), market: 'US', ticker: 'MSTR', name: '스트래티지', qty: 45, avgCost: 346, costCurrency: 'USD', classification: 'RISKY' },
+    ]};
+  const miraeP = { id: uid(), name: '미래에셋증권 연금저축', type: '연금저축', currency: 'KRW', cashBalance: 0,
+    holdings: [
+      { id: uid(), market: 'KR_KS', ticker: '426030', name: 'TIGER 미국나스닥100액티브', qty: 152, avgCost: 45628, costCurrency: 'KRW', classification: 'INDEX' },
+    ]};
+  const shinhan = { id: uid(), name: '신한은행 퇴직연금', type: '퇴직연금', currency: 'KRW', cashBalance: 0,
+    holdings: [
+      { id: uid(), market: 'KR_KS', ticker: '426030', name: 'TIGER 미국나스닥100액티브',         qty: 1105, avgCost: 45628, costCurrency: 'KRW', classification: 'INDEX' },
+      { id: uid(), market: 'KR_KS', ticker: '0019K0', name: 'TIGER 미국나스닥100채권혼합50액티브', qty: 1425, avgCost: 13115, costCurrency: 'KRW', classification: 'INDEX' },
+    ]};
+  const upbit = { id: uid(), name: '업비트', type: '암호화폐', currency: 'KRW', cashBalance: 0,
+    holdings: [
+      // BTC: 평단 160,714,905원/개 × 0.036922 ≈ 593만원 원금
+      { id: uid(), market: 'CRYPTO', ticker: 'BTC', name: '비트코인',  qty: 0.036922425, avgCost: 160714905, costCurrency: 'KRW', classification: 'RISKY' },
+      // ETH: 엑셀 원금 4,684,121원 ÷ 수량 0.82054575 = 평단 5,708,536원/개
+      { id: uid(), market: 'CRYPTO', ticker: 'ETH', name: '이더리움',  qty: 0.82054575, avgCost: 5708536, costCurrency: 'KRW', classification: 'RISKY' },
+    ]};
+  return [toss, miraeS, miraeP, shinhan, upbit];
+}
+
+/**
+ * 엑셀 데이터로 초기화 - 사용자가 명시적으로 호출
+ */
+function loadSampleData() {
+  if (state.accounts.length > 0) {
+    if (!confirm('현재 포트폴리오 데이터를 모두 삭제하고 엑셀 시드 데이터(5개 계좌 / 19개 종목)로 교체합니다.\n\n계속하시겠습니까?')) return;
+  }
+  const seedAccounts = buildSeedAccounts();
+  state.accounts = seedAccounts;
+  state.openAccounts = {};
+  state.openAccounts[seedAccounts[0].id] = true;
+  state.groupTargets = { ...DEFAULT_GROUP_TARGETS };
+  save();
+  render();
+  refreshAllPrices();
+  toast('✓ 엑셀 시드 데이터 적용 완료 (5계좌/19종목)');
+}
+window.loadSampleData = loadSampleData;
 
 /* Import/Export */
 function exportJSON() {
@@ -2793,43 +3240,22 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Portfolio
   load();
+  // groupTargets 기본값 보장 (DEFAULT_GROUP_TARGETS는 함수 외부에 선언되어 init 시점엔 사용 가능)
+  if (!state.groupTargets) state.groupTargets = { ...DEFAULT_GROUP_TARGETS };
 
   $('#btnRefresh').onclick = refreshAllPrices;
   $('#btnAddHolding').onclick = () => openHoldingSheet();
   $('#btnExport').onclick = exportJSON;
   $('#btnImport').onclick = () => $('#fileImport').click();
   $('#fileImport').onchange = e => { if (e.target.files[0]) importJSON(e.target.files[0]); };
+  $('#btnLoadSample').onclick = loadSampleData;
   $$('[data-close]').forEach(b => b.onclick = closeSheet);
 
+  // 시드 데이터 - 계좌가 비어있을 때 자동 적용
   if (state.accounts.length === 0) {
-    // V8 포트폴리오 기반 풍부한 시드 데이터 — 사용자가 나중에 본인 값으로 수정
-    const ibkr = { id: uid(), name: 'IBKR 해외계좌', type: '해외주식', currency: 'USD', cashBalance: 0,
-      holdings: [
-        { id: uid(), market: 'US', ticker: 'NVDA',  name: 'NVIDIA',     qty: 80,  avgCost: 450,  costCurrency: 'USD', targetWeight: 17.5 },
-        { id: uid(), market: 'US', ticker: 'GOOGL', name: 'Alphabet',   qty: 100, avgCost: 140,  costCurrency: 'USD', targetWeight: 12.5 },
-        { id: uid(), market: 'US', ticker: 'AMZN',  name: 'Amazon',     qty: 60,  avgCost: 160,  costCurrency: 'USD', targetWeight: 7.5  },
-        { id: uid(), market: 'US', ticker: 'TSM',   name: 'TSMC',       qty: 70,  avgCost: 130,  costCurrency: 'USD', targetWeight: 7.5  },
-        { id: uid(), market: 'US', ticker: 'PLTR',  name: 'Palantir',   qty: 250, avgCost: 25,   costCurrency: 'USD', targetWeight: 12.5 },
-        { id: uid(), market: 'US', ticker: 'MSFT',  name: 'Microsoft',  qty: 25,  avgCost: 380,  costCurrency: 'USD', targetWeight: 5    },
-        { id: uid(), market: 'US', ticker: 'LLY',   name: 'Eli Lilly',  qty: 15,  avgCost: 700,  costCurrency: 'USD', targetWeight: 5    },
-        { id: uid(), market: 'US', ticker: 'NTRA',  name: 'Natera',     qty: 80,  avgCost: 90,   costCurrency: 'USD', targetWeight: 3    },
-        { id: uid(), market: 'US', ticker: 'IONQ',  name: 'IonQ',       qty: 200, avgCost: 12,   costCurrency: 'USD', targetWeight: 2    },
-        { id: uid(), market: 'US', ticker: 'RKLB',  name: 'Rocket Lab', qty: 400, avgCost: 8,    costCurrency: 'USD', targetWeight: 4    },
-        { id: uid(), market: 'CASH', ticker: 'USD', name: '달러 예수금', qty: 1,   avgCost: 8000, costCurrency: 'USD' },
-      ]};
-    const kiwoom = { id: uid(), name: '키움 일반계좌', type: '일반주식', currency: 'KRW', cashBalance: 0,
-      holdings: [
-        { id: uid(), market: 'KR_KS', ticker: '000660', name: 'SK하이닉스', qty: 50, avgCost: 130000, costCurrency: 'KRW', targetWeight: 8 },
-        { id: uid(), market: 'KR_KS', ticker: '005930', name: '삼성전자',   qty: 100, avgCost: 70000, costCurrency: 'KRW', targetWeight: 5 },
-        { id: uid(), market: 'CASH', ticker: 'KRW', name: '원화 예수금', qty: 1, avgCost: 5000000, costCurrency: 'KRW' },
-      ]};
-    const upbit = { id: uid(), name: '업비트', type: '암호화폐', currency: 'KRW', cashBalance: 0,
-      holdings: [
-        { id: uid(), market: 'CRYPTO', ticker: 'BTC', name: 'Bitcoin',  qty: 0.15, avgCost: 60000, costCurrency: 'USD', targetWeight: 4 },
-        { id: uid(), market: 'CRYPTO', ticker: 'ETH', name: 'Ethereum', qty: 2,    avgCost: 3000,  costCurrency: 'USD', targetWeight: 2 },
-      ]};
-    state.accounts = [ibkr, kiwoom, upbit];
-    state.openAccounts[ibkr.id] = true;
+    // 첫 방문 시 자동으로 엑셀 시드 데이터 적용
+    state.accounts = buildSeedAccounts();
+    state.openAccounts[state.accounts[0].id] = true;
     save();
   }
   render();
